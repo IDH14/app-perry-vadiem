@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/IDH14/client-perry-vadiem/issues"
   },
-  "homepage": "https://github.com/IDH14/client-perry-vadiem#readme"
+  "homepage": "https://github.com/IDH14/client-perry-vadiem#readme",
+  "dependencies": {
+    "yargs": "^6.3.0"
+  }
 }
