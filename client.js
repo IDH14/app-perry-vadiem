@@ -4,7 +4,7 @@ const net = require('net');
  * Create connection and write to server
  */
 const client = net.createConnection({ port: 50201 }, () => {
-  client.write('world!\r\n');
+  client.write('LIST idh14sync/1.0\r\n');
 });
 
 /**
