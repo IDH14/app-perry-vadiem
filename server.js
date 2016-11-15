@@ -1,4 +1,12 @@
 const net = require('net');
+const http = require('http');
+const path = require('path');
+const fs = require('fs');
+const dir = __dirname;
+
+// working files directory
+const fileDir = path.join(dir, '/files');
+
 var server = net.createServer((socket) => {
   socket.setEncoding('utf8');
 
@@ -9,7 +17,11 @@ var server = net.createServer((socket) => {
     console.log(method + ' - ' + new Date(Date.now()).toLocaleString());
 
 
-    socket.write('RESPONSE idh14sync/1.0\r\n\r\n' + JSON.stringify(methodSwitch(method)));
+    socket.write(
+`RESPONSE idh14sync/1.0
+    
+` + JSON.stringify(methodSwitch(method), null, 2)
+);
 
   });
 
@@ -52,7 +64,24 @@ function methodSwitch(method) {
 }
 
 function listFiles() {
-  return { files: 'list of files' };
+  const response = {
+    "status": 200,
+    "files": []
+  };
+  const files = fs.readdirSync(fileDir);
+
+  files.forEach(function (fileName) {
+    const filePath = path.join(fileDir, fileName);
+    const file = fs.readFileSync(filePath);
+
+    response.files.push({
+      filename: fileName,
+      checksum: file.toString('base64')
+    });
+
+  }, this);
+
+  return response;
 }
 
 function getFile() {
