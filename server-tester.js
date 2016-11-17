@@ -2,10 +2,12 @@ const net = require('net');
 const os = require('os');
 const argv = require('yargs').argv;
 
+const port = argv.port || 50201;
+
 /**
  * Create connection and write to server
  */
-const client = net.createConnection({ port: 50201 }, () => {
+const client = net.createConnection({ port: port }, () => {
 
   const method = argv.method || '';
   const filename = argv.file || 'file1.txt'; 

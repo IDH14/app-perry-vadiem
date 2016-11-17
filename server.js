@@ -4,7 +4,10 @@ const path = require('path');
 const fs = require('fs');
 const crypto = require('crypto');
 const os = require('os');
+const argv = require('yargs').argv;
 const dir = __dirname;
+
+const port = argv.port || 50201;
 
 function checksum (str, algorithm, encoding) {
     return crypto
@@ -50,7 +53,7 @@ server.on('error', (err) => {
 /**
  * listen to random port
  */
-server.listen(50201, () => {
+server.listen(port, () => {
   console.log('opened server on', server.address());
 });
 
