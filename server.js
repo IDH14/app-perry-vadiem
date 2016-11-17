@@ -29,8 +29,7 @@ var server = net.createServer((socket) => {
     const body = data[1] || '{}';
     const json = JSON.parse(body);
     const date = new Date(Date.now()).toLocaleString();
-
-    console.log(`${method} - ${body} - ${date}`);
+    console.log(`${socket.remoteAddress}:${socket.remotePort} - ${method} - ${body} - ${date}`);
 
     socket.write('RESPONSE idh14sync/1.0' + os.EOL + os.EOL + JSON.stringify(methodSwitch(method, json), null, 2));
 

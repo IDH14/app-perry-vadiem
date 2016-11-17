@@ -2,17 +2,16 @@ const net = require('net');
 const os = require('os');
 const argv = require('yargs').argv;
 
+const host = argv.host || 'localhost';
 const port = argv.port || 50201;
 
 /**
  * Create connection and write to server
  */
-const client = net.createConnection({ port: port }, () => {
+const client = net.createConnection({ host: host, port: port }, () => {
 
   const method = argv.method || '';
   const filename = argv.file || 'file1.txt'; 
-
-  console.log(method, filename);
 
   switch (method) {
     case 'LIST':
