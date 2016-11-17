@@ -1,9 +1,16 @@
 # app-perry-vadiem
 
-	$ nodemon server.js
+	$ npm install -g nodemon // for testing
+
+	# install dependencies
+	$ npm install
+
+	# start server
+	$ nodemon server.js OR node server.js
 	
-	$ node client.js --method=LIST
-	$ node client.js --method=GET --file=file1.txt
-	$ node client.js --method=GET --file=file3.txt
-	$ node client.js --method=DELETE --file=file1.txt
-	$ node client.js --method=DELETE --file=file3.txt
+	# call test scripts
+	$ node server-tester.js --method=LIST
+	$ node server-tester.js --method=GET --file=file1.txt
+	$ node server-tester.js --method=GET --file=file3.txt
+	$ node server-tester.js --method=DELETE --file=file1.txt
+	$ node server-tester.js --method=DELETE --file=file3.txt
