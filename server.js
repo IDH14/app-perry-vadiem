@@ -2,7 +2,16 @@ const net = require('net');
 const http = require('http');
 const path = require('path');
 const fs = require('fs');
+const crypto = require('crypto');
+const os = require('os');
 const dir = __dirname;
+
+function checksum (str, algorithm, encoding) {
+    return crypto
+        .createHash(algorithm || 'sha1')
+        .update(str, 'utf8')
+        .digest(encoding || 'hex')
+}
 
 // working files directory
 const fileDir = path.join(dir, '/files');
@@ -10,17 +19,17 @@ const fileDir = path.join(dir, '/files');
 var server = net.createServer((socket) => {
   socket.setEncoding('utf8');
 
-  socket.on('data', (data) => {
+  socket.on('data', (input) => {
 
-    var method = data.substring(0, data.indexOf(' '));
+    const data = input.split(os.EOL);
+    const method = data[0].substring(0, data[0].indexOf(' '));
+    const body = data[1] || '{}';
+    const json = JSON.parse(body);
+    const date = new Date(Date.now()).toLocaleString();
 
-    console.log(method + ' - ' + new Date(Date.now()).toLocaleString());
+    console.log(`${method} - ${body} - ${date}`);
 
-
-    socket.write(
-`RESPONSE idh14sync/1.0
-    
-` + JSON.stringify(methodSwitch(method), null, 2)
+    socket.write('RESPONSE idh14sync/1.0' + os.EOL + os.EOL + JSON.stringify(methodSwitch(method, json), null, 2)
 );
 
   });
@@ -47,36 +56,44 @@ server.listen(50201, () => {
 });
 
 
-function methodSwitch(method) {
+function methodSwitch(method, body) {
 
-  switch (method) {
-    case 'LIST':
-      return listFiles();
-    case 'GET':
-      return getFile();
-    case 'PUT':
-      return putFile();
-    case 'DELETE':
-      return deleteFile();
+  try {
+    
+    switch (method) {
+      case 'LIST':
+        return listFiles();
+      case 'GET':
+        return getFile(body);
+      case 'PUT':
+        return putFile(body);
+      case 'DELETE':
+        return deleteFile();
+    }
+
+    throw 'Wrong method, supported methods: LIST, GET, PUT, DELETE'
+
+  } catch (error) {
+    return { error: error };
   }
 
-  return { error: 'Wrong method, supported methods: LIST, GET, PUT, DELETE' };
+  
 }
 
 function listFiles() {
   const response = {
-    "status": 200,
-    "files": []
+    'status': 200,
+    'files': []
   };
   const files = fs.readdirSync(fileDir);
 
   files.forEach(function (fileName) {
     const filePath = path.join(fileDir, fileName);
-    const file = fs.readFileSync(filePath);
+    const file = fs.readFileSync(filePath, 'utf-8');
 
     response.files.push({
       filename: fileName,
-      checksum: file.toString('base64')
+      checksum: checksum(file)
     });
 
   }, this);
@@ -84,8 +101,22 @@ function listFiles() {
   return response;
 }
 
-function getFile() {
-  return { error: 'Method not yet implemented' };
+function getFile(body) {
+  try {
+    const filePath = path.join(fileDir, body.filename);
+    const file = fs.readFileSync(filePath, 'utf-8');
+    
+    const response = {
+      'status': 200,
+      'filename': body.filename,
+      'checksum': checksum(file),
+      'content': new Buffer(file).toString('base64')
+    };  
+
+    return response;
+  } catch (error) {
+    throw 'No such file or directory' 
+  }
 }
 
 function putFile() {
