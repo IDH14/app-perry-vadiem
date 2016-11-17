@@ -1,11 +1,9 @@
 # app-perry-vadiem
 
-	$ node server.js
+	$ nodemon server.js
 	
-Client LIST request
-
 	$ node client.js --method=LIST
-
-Client GET request
-
-	$ node client.js --method=GET
+	$ node client.js --method=GET --file=file1.txt
+	$ node client.js --method=GET --file=file3.txt
+	$ node client.js --method=DELETE --file=file1.txt
+	$ node client.js --method=DELETE --file=file3.txt

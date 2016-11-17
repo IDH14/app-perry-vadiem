@@ -29,8 +29,7 @@ var server = net.createServer((socket) => {
 
     console.log(`${method} - ${body} - ${date}`);
 
-    socket.write('RESPONSE idh14sync/1.0' + os.EOL + os.EOL + JSON.stringify(methodSwitch(method, json), null, 2)
-);
+    socket.write('RESPONSE idh14sync/1.0' + os.EOL + os.EOL + JSON.stringify(methodSwitch(method, json), null, 2));
 
   });
 
@@ -59,7 +58,6 @@ server.listen(50201, () => {
 function methodSwitch(method, body) {
 
   try {
-    
     switch (method) {
       case 'LIST':
         return listFiles();
@@ -68,16 +66,13 @@ function methodSwitch(method, body) {
       case 'PUT':
         return putFile(body);
       case 'DELETE':
-        return deleteFile();
+        return deleteFile(body);
     }
 
-    throw 'Wrong method, supported methods: LIST, GET, PUT, DELETE'
-
+    throw { status: 400 }
   } catch (error) {
-    return { error: error };
+    return error;
   }
-
-  
 }
 
 function listFiles() {
@@ -115,7 +110,7 @@ function getFile(body) {
 
     return response;
   } catch (error) {
-    throw 'No such file or directory' 
+    return { 'status': 404 } 
   }
 }
 
@@ -123,7 +118,14 @@ function putFile() {
   return { error: 'Method not yet implemented' };
 }
 
-function deleteFile() {
-  return { error: 'Method not yet implemented' };
+function deleteFile(body) {
+  try {
+    const filePath = path.join(fileDir, body.filename);
+    fs.unlinkSync(filePath); 
+
+    return { 'status': 200 }; 
+  } catch (error) {
+    return { 'status': 100 };
+  }
 }
 
