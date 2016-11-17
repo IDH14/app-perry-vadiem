@@ -17,7 +17,7 @@ function checksum (str, algorithm, encoding) {
 }
 
 // working files directory
-const fileDir = path.join(dir, '/files');
+const fileDir = path.join(dir, '/server-files');
 
 var server = net.createServer((socket) => {
   socket.setEncoding('utf8');

@@ -5,6 +5,10 @@
 	# install dependencies
 	$ npm install
 
+	# create file directories
+	$ mkdir client-files server-files
+	$ touch server-files/file1.txt server-files/file2.txt
+
 	# start server
 	$ nodemon server.js OR node server.js
 	
