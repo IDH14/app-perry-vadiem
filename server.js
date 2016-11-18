@@ -2,26 +2,20 @@ const net = require('net');
 const http = require('http');
 const path = require('path');
 const fs = require('fs');
-const crypto = require('crypto');
 const os = require('os');
 const argv = require('yargs').argv;
+const helpers = require('./helpers.js');
 const dir = __dirname;
-
-const port = argv.port || 50201;
-
-function checksum (str, algorithm, encoding) {
-    return crypto
-        .createHash(algorithm || 'sha1')
-        .update(str, 'utf8')
-        .digest(encoding || 'hex')
-}
 
 // working files directory
 const fileDir = path.join(dir, '/server-files');
 
+const port = argv.port || 50201;
+
 var server = net.createServer((socket) => {
   socket.setEncoding('utf8');
 
+  // when receiveing data from the socket
   socket.on('data', (input) => {
 
     const data = input.split(os.EOL);
@@ -29,17 +23,24 @@ var server = net.createServer((socket) => {
     const body = data[1] || '{}';
     const json = JSON.parse(body);
     const date = new Date(Date.now()).toLocaleString();
+    
     console.log(`${socket.remoteAddress}:${socket.remotePort} - ${method} - ${body} - ${date}`);
 
     socket.write('RESPONSE idh14sync/1.0' + os.EOL + os.EOL + JSON.stringify(methodSwitch(method, json), null, 2));
 
   });
 
+  // runs after data has been transmitted
   socket.on('end', () => {
-    // console.log('SERVER-ONEND\n');
+
   });
+});
 
-
+/**
+ * runs when server.closed() gets called
+ */
+server.on('close', () => {
+  console.log('closed server');
 });
 
 /**
@@ -50,12 +51,11 @@ server.on('error', (err) => {
 });
 
 /**
- * listen to random port
+ * listen to specified port
  */
 server.listen(port, () => {
   console.log('opened server on', server.address());
 });
-
 
 function methodSwitch(method, body) {
 
@@ -90,7 +90,7 @@ function listFiles() {
 
     response.files.push({
       filename: fileName,
-      checksum: checksum(file)
+      checksum: helpers.checksum(file)
     });
 
   }, this);
@@ -102,17 +102,17 @@ function getFile(body) {
   try {
     const filePath = path.join(fileDir, body.filename);
     const file = fs.readFileSync(filePath, 'utf-8');
-    
+
     const response = {
       'status': 200,
       'filename': body.filename,
-      'checksum': checksum(file),
+      'checksum': helpers.checksum(file),
       'content': new Buffer(file).toString('base64')
-    };  
+    };
 
     return response;
   } catch (error) {
-    return { 'status': 404 } 
+    return { 'status': 404 }
   }
 }
 
@@ -123,9 +123,9 @@ function putFile() {
 function deleteFile(body) {
   try {
     const filePath = path.join(fileDir, body.filename);
-    fs.unlinkSync(filePath); 
+    fs.unlinkSync(filePath);
 
-    return { 'status': 200 }; 
+    return { 'status': 200 };
   } catch (error) {
     return { 'status': 100 };
   }
