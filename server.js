@@ -1,5 +1,4 @@
 const net = require('net');
-const http = require('http');
 const path = require('path');
 const fs = require('fs');
 const os = require('os');
@@ -78,6 +77,7 @@ function methodSwitch(method, body) {
 }
 
 function listFiles() {
+
   const response = {
     'status': 200,
     'files': []

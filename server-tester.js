@@ -1,9 +1,15 @@
 const net = require('net');
 const os = require('os');
+const fs = require('fs');
+const path = require('path');
 const argv = require('yargs').argv;
+const dir = __dirname;
 
 const host = argv.host || 'localhost';
 const port = argv.port || 50201;
+
+fs.writeFileSync(path.join(dir, '/server-files/file1.txt'), 'Hello Node.js', 'utf8');
+fs.writeFileSync(path.join(dir, '/server-files/file2.txt'), 'Goodbye Node.js', 'utf8');
 
 /**
  * Create connection and write to server
