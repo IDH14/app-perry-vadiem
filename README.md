@@ -23,3 +23,7 @@ $ node server-tester.js --method=LIST --port=[port nr.] --host=[host nr.]
 ````
 
 # Client
+
+
+# Rewrite Typescript
+https://basarat.gitbooks.io/typescript/content/docs/quick/nodejs.html
