@@ -6,7 +6,8 @@ import yargs = require('yargs')
 
 import { log } from './modules/logger';
 import Request from './modules/request';
-import Response from './modules/response';
+import ResponseFactory from './modules/Response/ResponseFactory';
+import ResponseInterface from './modules/Response/ResponseInterface';
 
 
 const argv = yargs.argv;
@@ -24,11 +25,13 @@ var server = net.createServer((socket) => {
   // when receiveing data from the socket
   socket.on('data', (input: string) => {
 
-    const request: Request = new Request();
+    var request: Request = new Request();
     request.parseRequest(input);
 
-    const response: Response = new Response();
-    response.createFromRequest(request);
+    console.log(request);
+    var response: ResponseInterface = ResponseFactory.createFromRequest(request);
+
+    response.create();
 
     socket.write(response.toString());
 

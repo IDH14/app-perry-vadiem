@@ -1,6 +1,6 @@
 const test = require('tape');
 const os = require('os');
-import Request from './request';
+import Request from './../request';
 import Response from './response';
 
 const mockRequest = {
