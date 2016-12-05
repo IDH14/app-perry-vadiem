@@ -17,12 +17,16 @@ fs.writeFileSync(path.join(dir, '/server-files/file2.txt'), 'Goodbye Node.js', '
 const client = net.createConnection({ host: host, port: port }, () => {
 
   const method = argv.method || '';
-  const filename = argv.file || 'file1.txt'; 
+  const filename = argv.file || 'file1.txt';
 
   switch (method) {
     case 'LIST':
       const list = `LIST idh14sync/1.0`;
       client.write(list);
+      break;
+    case 'LIS':
+      const lis = `LIS idh14sync/1.0`;
+      client.write(lis);
       break;
 
     case 'GET':
