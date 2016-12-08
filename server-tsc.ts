@@ -28,7 +28,6 @@ var server = net.createServer((socket) => {
     var request: Request = new Request();
     request.parseRequest(input);
 
-    console.log(request);
     var response: ResponseInterface = ResponseFactory.createFromRequest(request);
 
     response.create();
