@@ -20,6 +20,9 @@ $ node server-tester.js --method=GET --file=file3.txt
 $ node server-tester.js --method=DELETE --file=file1.txt
 $ node server-tester.js --method=DELETE --file=file3.txt
 $ node server-tester.js --method=LIST --port=[port nr.] --host=[host nr.]
+
+# run unit tests
+$ npm test
 ````
 
 # Rewrite Typescript
