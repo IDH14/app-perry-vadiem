@@ -24,10 +24,6 @@ const client = net.createConnection({ host: host, port: port }, () => {
       const list = `LIST idh14sync/1.0`;
       client.write(list);
       break;
-    case 'LIS':
-      const lis = `LIS idh14sync/1.0`;
-      client.write(lis);
-      break;
 
     case 'GET':
       const get = `GET idh14sync/1.0${os.EOL}{ "filename": "${filename}" }`;
@@ -43,6 +39,12 @@ const client = net.createConnection({ host: host, port: port }, () => {
       const remove = `DELETE idh14sync/1.0${os.EOL}{ "filename": "${filename}" }`;
       client.write(remove);
       break;
+
+    default:
+      const lis = `LIS idh14sync/1.0`;
+      client.write(lis);
+      break;
+
   }
 });
 

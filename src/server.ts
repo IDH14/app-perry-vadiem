@@ -4,20 +4,19 @@ import fs = require('fs')
 import os = require('os')
 import yargs = require('yargs')
 
+import { config } from './config';
 import { log } from './modules/logger';
 import Request from './modules/request';
 import ResponseFactory from './modules/Response/ResponseFactory';
 import ResponseInterface from './modules/Response/ResponseInterface';
 
-
 const argv = yargs.argv;
 
-// const helpers = require('./helpers.js')
-const dir = __dirname
+// set port we need to listen to
+config.port = argv.port || config.defaultPort;
 
-const fileDir = path.join(dir, '/server-files');
-
-const port = argv.port || 50202;
+// set files folder
+config.filesDir = argv.dir || config.defaultFilesDir;
 
 var server = net.createServer((socket) => {
   socket.setEncoding('utf8');
@@ -33,9 +32,6 @@ var server = net.createServer((socket) => {
     response.create();
 
     socket.write(response.toString());
-
-    // socket.write('RESPONSE idh14sync/1.0' + os.EOL + os.EOL + JSON.stringify(methodSwitch(method, json), null, 2));
-
   });
 
   // runs after data has been transmitted
@@ -61,6 +57,6 @@ server.on('error', (err) => {
 /**
  * listen to specified port
  */
-server.listen(port, () => {
+server.listen(config.port, () => {
   console.log('opened server on', server.address());
 });

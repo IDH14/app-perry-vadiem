@@ -1,8 +1,8 @@
 const path = require('path');
 const fs = require('fs');
-const dir = __dirname;
+
 import { checksum } from './../Helpers';
-const fileDir = path.join(dir + '/../../', '/server-files');
+import { config } from './../../config';
 
 import Response from './Response';
 import ResponseInterface from './ResponseInterface';
@@ -12,7 +12,7 @@ export default class DeleteResponse extends Response implements ResponseInterfac
     create() {
         try {
             const filename = this.request.body['filename'];
-            const filePath = path.join(fileDir, filename);
+            const filePath = path.join(config.filesDir, filename);
             fs.unlinkSync(filePath);
 
             this.object = { 'status': 200 };

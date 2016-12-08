@@ -1,8 +1,7 @@
 const path = require('path');
 const fs = require('fs');
-const dir = __dirname;
 import { checksum } from './../Helpers';
-const fileDir = path.join(dir + '/../../', '/server-files');
+import { config } from './../../config';
 
 import Response from './Response';
 import ResponseInterface from './ResponseInterface';
@@ -16,10 +15,10 @@ export default class ListReponse extends Response implements ResponseInterface {
                 'status': 200,
                 'files': []
             };
-            const files = fs.readdirSync(fileDir);
+            const files = fs.readdirSync(config.filesDir);
 
             files.forEach(function (fileName) {
-                const filePath = path.join(fileDir, fileName);
+                const filePath = path.join(config.filesDir, fileName);
                 const file = fs.readFileSync(filePath, 'utf-8');
 
                 response.files.push({

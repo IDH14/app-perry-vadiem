@@ -4,10 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "npm run build:live",
-    "build:live": "nodemon --exec ./node_modules/.bin/ts-node -- ./server-tsc.ts",
-    "test": "ts-node ./node_modules/.bin/tape modules/**/*.spec.ts | ./node_modules/.bin/tap-spec",
-    "test:auto": "nodemon --watch modules --exec ./node_modules/.bin/ts-node -- ./node_modules/.bin/tape modules/**/*.spec.ts | ./node_modules/.bin/tap-spec"
+    "start": "nodemon --exec ./node_modules/.bin/ts-node -- ./src/server.ts",
+    "test": "ts-node ./node_modules/.bin/tape './src/**/*.spec.ts' | ./node_modules/.bin/tap-spec",
+    "test:auto": "nodemon --watch modules --exec ./node_modules/.bin/ts-node -- ./node_modules/.bin/tape './src/**/*.spec.ts' | ./node_modules/.bin/tap-spec"
   },
   "repository": {
     "type": "git",
