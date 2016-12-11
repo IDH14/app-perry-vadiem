@@ -1,5 +1,5 @@
-const path = require('path');
-const fs = require('fs');
+import path = require('path');
+import fs = require('fs');
 
 import { checksum } from './../Helpers';
 import { config } from './../../config';
@@ -7,6 +7,7 @@ import { config } from './../../config';
 import Response from './Response';
 import ResponseInterface from './ResponseInterface';
 import Request from './../Request';
+
 export default class DeleteResponse extends Response implements ResponseInterface {
 
     create() {

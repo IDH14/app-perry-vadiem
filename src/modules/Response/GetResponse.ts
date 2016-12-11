@@ -1,5 +1,5 @@
-const path = require('path');
-const fs = require('fs');
+import path = require('path');
+import fs = require('fs');
 
 import { checksum } from './../Helpers';
 import { config } from './../../config';
@@ -9,6 +9,7 @@ import ResponseInterface from './ResponseInterface';
 import Request from './../Request';
 
 export default class GetResponse extends Response implements ResponseInterface {
+
     create() {
         try {
             const filename = this.request.body['filename'];
@@ -25,6 +26,6 @@ export default class GetResponse extends Response implements ResponseInterface {
             this.object = response;
         } catch (error) {
             this.object = { 'status': 404 };
-        }        
+        }
     }
 }

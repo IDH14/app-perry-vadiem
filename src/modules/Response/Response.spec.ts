@@ -1,5 +1,5 @@
 const test = require('tape');
-const os = require('os');
+import os = require('os');
 import Request from './../request';
 import Response from './response';
 

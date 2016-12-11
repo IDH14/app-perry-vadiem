@@ -1,5 +1,7 @@
 import os = require('os');
+
 import Request from './../Request';
+
 abstract class Response {
 
     request: Request;
