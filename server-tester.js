@@ -6,10 +6,10 @@ const argv = require('yargs').argv;
 const dir = __dirname;
 
 const host = argv.host || 'localhost';
-const port = argv.port || 50201;
+const port = argv.port || 50202;
 
-fs.writeFileSync(path.join(dir, '/server-files/file1.txt'), 'Hello Node.js', 'utf8');
-fs.writeFileSync(path.join(dir, '/server-files/file2.txt'), 'Goodbye Node.js', 'utf8');
+//fs.writeFileSync(path.join(dir, '/server-files/ZmlsZTEudHh0'), 'Hello Node.js', 'utf8');
+//fs.writeFileSync(path.join(dir, '/server-files/ZmlsZTIudHh0'), 'Goodbye Node.js', 'utf8');
 
 /**
  * Create connection and write to server
@@ -17,7 +17,7 @@ fs.writeFileSync(path.join(dir, '/server-files/file2.txt'), 'Goodbye Node.js', '
 const client = net.createConnection({ host: host, port: port }, () => {
 
   const method = argv.method || '';
-  const filename = argv.file || 'file1.txt';
+  const filename = argv.file || 'ZmlsZTEudHh0';
 
   switch (method) {
     case 'LIST':
@@ -31,7 +31,7 @@ const client = net.createConnection({ host: host, port: port }, () => {
       break;
 
     case 'PUT':
-      const put = `PUT idh14sync/1.0${os.EOL}{"filename": "${filename}", "checksum": "8578201cf22b83bdaef44e1c5a5dc2e764218aa8", "original_checksum": "", "content": "" }`;
+      const put = `PUT idh14sync/1.0${os.EOL}{"filename": "${filename}", "checksum": "159cb8ab470d9f2d2b45a04f446da51c97190b25", "original_checksum": "cd0eaaf877ff870cfc17890248c7adfe2483f3a0", "content": "R29vZGJ5ZSBOb2RlLmpz" }`;
       client.write(put);
       break;
 
