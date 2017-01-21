@@ -40,3 +40,5 @@ server-files/
 client-files/
 .idea/
 .vscode/
+coverage/
+dist/

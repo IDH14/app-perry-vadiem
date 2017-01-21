@@ -8,14 +8,10 @@
 			"type": "node",
 			"request": "launch",
 			"name": "Launch Program",
-			"program": "${workspaceRoot}/server.js",
-			"cwd": "${workspaceRoot}"
-		},
-		{
-			"type": "node",
-			"request": "attach",
-			"name": "Attach to Process",
-			"port": 5858
+			"program": "${workspaceRoot}/src/client.ts",
+			"cwd": "${workspaceRoot}",
+			"sourceMaps": true,
+            "outFiles": "dist/**/*.js"
 		}
 	]
 }
