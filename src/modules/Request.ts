@@ -13,14 +13,13 @@ export interface ServerResponse {
 	body: any;
 }
 
-export function doCall(payload: string) {
+export function doCall(method: string, jsonBody: any) {
 	return new Promise((resolve, reject) => {
 		const conn = net.createConnection({ port: port, host: host }, () => {
 
-			conn.write(payload);
+			conn.write(method + "\r\n\r\n" + JSON.stringify(jsonBody));
 
 			conn.on('data', (data) => {
-				console.log(data.toString());
 				resolve(parseResponse(data.toString()));
 				conn.destroy();
 			});
@@ -36,7 +35,7 @@ export function parseResponse(data: string): ServerResponse {
 
 	const joinedLines = lines.join('');
 
-	const body = this.parseJson(joinedLines || '{}');
+	const body = parseJson(joinedLines || '{}');
 
 	let response: ServerResponse = {
 		version: metaParts[1],
@@ -45,4 +44,11 @@ export function parseResponse(data: string): ServerResponse {
 	};
 
 	return response;
+}
+
+/**
+ * Transform given string to JSON
+ */
+export function parseJson(data: string) {
+	return JSON.parse(data);
 }
