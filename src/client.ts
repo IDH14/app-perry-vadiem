@@ -61,6 +61,14 @@ function parseFileListResponse(data) {
 
 	var fileList = [];
 
+	Object.keys(syncInfo.files).forEach((fileName, index) => {
+		var fileExists = _.find(data.body.files, { 'filename': toBase64(fileName) });
+
+		if(_.isUndefined(fileExists)) {
+			fs.unlinkSync(fileDir + '/' + fileName);
+		}
+	});
+
 	data.body.files.forEach(file => {
 		// if file does not exist in synclist
 		if(!_.has(syncInfo.files, fromBase64(file.filename))) {
@@ -70,6 +78,11 @@ function parseFileListResponse(data) {
 
 		// if file exists and hash is different
 		var filePath = fileDir + '/' + fromBase64(file.filename);
+
+		if(!fs.existsSync(filePath)) {
+			return;
+		}
+
 		var fileContents = fs.readFileSync(filePath, 'utf-8');
 		var fileHash = checksum(fileContents);
 
@@ -83,7 +96,6 @@ function parseFileListResponse(data) {
 }
 
 function fetchNewFiles(data) {
-
 	var promises = [];
 	data.forEach(fileName => {
 		promises.push(doCall('GET idh14sync/1.0', { filename: fileName }));
@@ -106,13 +118,46 @@ function checkNewFilesFromClient() {
 	var existingFiles = readFileTree();
 	var newFiles = [];
 
+	console.log('=====');
+	console.log(syncFileFilelist);
+	console.log(existingFiles);
+	console.log('=====');
+
+	let promises = [];
+
+	Object.keys(syncFileFilelist).forEach((fileName) => {
+		if(!_.has(existingFiles, fileName)) {
+
+			var checksum = syncFileFilelist[fileName];
+
+			promises.push(doCall('DELETE idh14sync', {
+				'filename': toBase64(fileName),
+				'checksum': checksum
+			}));
+		}
+	});
+
 	existingFiles.forEach(file => {
 		if(!_.has(syncFileFilelist, file)) {
+			newFiles.push(file);
+			return;
+		}
+
+		var filePath = fileDir + '/' + file;
+		var fileContents = fs.readFileSync(filePath, 'utf-8');
+		var fileHash = checksum(fileContents);
+
+		// console.log('before if');
+		// console.log(file);
+		// console.log(syncFileFilelist);
+		// console.log(syncFileFilelist[file]);
+		// console.log(fileHash);
+
+		if(syncFileFilelist[file] !== fileHash) {
 			newFiles.push(file);
 		}
 	});
 
-	let promises = [];
 	newFiles.forEach(fileName => {
 		promises.push(uploadFile(fileName));
 	});
@@ -123,11 +168,14 @@ function checkNewFilesFromClient() {
 function uploadFile(fileName) {
 	let filePath = fileDir + '/' + fileName;
 	let fileContents = fs.readFileSync(filePath, 'utf-8');
+	let syncFile = readSyncFile();
+	let syncFileList = syncFile.files;
+	let originalChecksum = syncFileList[fileName] || '';
 
 	let body = {
 		filename: toBase64(fileName),
 		checksum: checksum(fileContents),
-		original_checksum: '',
+		original_checksum: originalChecksum,
 		content: toBase64(fileContents)
 	};
 
