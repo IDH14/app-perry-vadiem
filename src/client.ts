@@ -73,7 +73,7 @@ function parseFileListResponse(data) {
 		var fileContents = fs.readFileSync(filePath, 'utf-8');
 		var fileHash = checksum(fileContents);
 
-		if(fileHash !== file.checksum) {
+		if(syncInfo.files[fromBase64(file.filename)] !== file.checksum) {
 			fs.renameSync(filePath, filePath + '-' + (new Date()).valueOf().toString());
 			fileList.push(file.filename);
 		}
