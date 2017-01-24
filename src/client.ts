@@ -21,12 +21,15 @@ initApp()
 	.then(syncInfoFileCheck)
 	.then(fetchFileList)
 	.then(parseFileListResponse)
-	.then(getNewFiles)
-	.then(createNewFiles)
 
+	// get new files from server
+	.then(fetchNewFiles)
+	.then(writeNewFiles)
 
+	// upload new files from client
+	.then(checkNewFilesFromClient)
 
-
+	// .then(deleteOldFiles)
 
 	.then(updateSyncFile)
 
@@ -54,21 +57,32 @@ function fetchFileList() {
  * Parses the response from the LIST Request
  */
 function parseFileListResponse(data) {
-	var syncInfo = JSON.parse(fs.readFileSync(syncInfoFile, 'UTF-8'));
+	var syncInfo = readSyncFile();
 
 	var fileList = [];
+
 	data.body.files.forEach(file => {
-		if(!_.has(syncInfo.files, file.filename)) {
+		// if file does not exist in synclist
+		if(!_.has(syncInfo.files, fromBase64(file.filename))) {
+			fileList.push(file.filename);
+			return;
+		}
+
+		// if file exists and hash is different
+		var filePath = fileDir + '/' + fromBase64(file.filename);
+		var fileContents = fs.readFileSync(filePath, 'utf-8');
+		var fileHash = checksum(fileContents);
+
+		if(fileHash !== file.checksum) {
+			fs.renameSync(filePath, filePath + '-' + (new Date()).valueOf().toString());
 			fileList.push(file.filename);
 		}
 	});
 
-	console.log('difference', fileList);
-
 	return fileList;
 }
 
-function getNewFiles(data) {
+function fetchNewFiles(data) {
 
 	var promises = [];
 	data.forEach(fileName => {
@@ -78,7 +92,7 @@ function getNewFiles(data) {
 	return Promise.all(promises);
 }
 
-function createNewFiles(files) {
+function writeNewFiles(files) {
 	var fileList = {};
 	files.forEach(file => {
 		fs.writeFileSync(fileDir + '/' + fromBase64(file.body.filename), fromBase64(file.body.content));
@@ -86,24 +100,85 @@ function createNewFiles(files) {
 	});
 }
 
-function updateSyncFile() {
-	const files = fs.readdirSync(fileDir);
-	const fileList = {};
+function checkNewFilesFromClient() {
+	var syncFile = readSyncFile();
+	var syncFileFilelist = syncFile.files;
+	var existingFiles = readFileTree();
+	var newFiles = [];
+
+	existingFiles.forEach(file => {
+		if(!_.has(syncFileFilelist, file)) {
+			newFiles.push(file);
+		}
+	});
+
+	let promises = [];
+	newFiles.forEach(fileName => {
+		promises.push(uploadFile(fileName));
+	});
+
+	return promises;
+}
+
+function uploadFile(fileName) {
+	let filePath = fileDir + '/' + fileName;
+	let fileContents = fs.readFileSync(filePath, 'utf-8');
+
+	let body = {
+		filename: toBase64(fileName),
+		checksum: checksum(fileContents),
+		original_checksum: '',
+		content: toBase64(fileContents)
+	};
+
+	return doCall('PUT idh14sync', body);
+}
+
+function checkExistingFilesFromClient() {
+
+}
+
+/**
+ * Returns a list of files in the fileTree.
+ * Removes unwanted files (dot-files eg.)
+ */
+function readFileTree() {
+	let files = fs.readdirSync(fileDir);
 
 	_.remove(files, (val) => {
 		return val === '.DS_Store' || val === '.syncfile.json'
 	});
 
+	return files;
+}
+
+/**
+ * Returns current SyncFile
+ */
+function readSyncFile() {
+	return JSON.parse(fs.readFileSync(syncInfoFile, 'UTF-8'));
+}
+
+/**
+ * Rebuild syncfile with current file tree
+ */
+function updateSyncFile() {
+	const files = readFileTree();
+	const fileList = {};
+
 	files.forEach(function (fileName) {
 		const filePath = path.join(fileDir, fileName);
 		const file = fs.readFileSync(filePath, 'utf-8');
 
-		fileList[toBase64(fileName)] = checksum(file);
+		fileList[fileName] = checksum(file);
 	});
 
 	writeSyncFile(fileList);
 }
 
+/**
+ * Write new syncfile to disk
+ */
 function writeSyncFile(files = {}) {
 	var syncFileInfoJson = {
 		'version': '1.0.0',
@@ -113,8 +188,6 @@ function writeSyncFile(files = {}) {
 
 	fs.writeFileSync(syncInfoFile, JSON.stringify(syncFileInfoJson), 'UTF-8');
 }
-
-
 
 // fetch list of files from server
 
