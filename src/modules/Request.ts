@@ -16,8 +16,9 @@ export interface ServerResponse {
 export function doCall(method: string, jsonBody: any) {
 	return new Promise((resolve, reject) => {
 		const conn = net.createConnection({ port: port, host: host }, () => {
+			let request = method + "\r\n\r\n" + JSON.stringify(jsonBody);
 
-			conn.write(method + "\r\n\r\n" + JSON.stringify(jsonBody));
+			conn.write(request);
 
 			conn.on('data', (data) => {
 				resolve(parseResponse(data.toString()));
